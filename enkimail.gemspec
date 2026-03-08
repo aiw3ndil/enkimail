@@ -10,13 +10,13 @@ Gem::Specification.new do |spec|
 
   spec.summary = "Enkimail delivery method for ActionMailer"
   spec.description = "Integrate Rails with Enkimail API to send emails seamlessly."
-  spec.homepage = "https://github.com/enkimail/enkimail-ruby"
+  spec.homepage = "https://github.com/aiw3ndil/enkimail"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2.0"
 
   spec.metadata["allowed_push_host"] = "https://rubygems.org"
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/enkimail/enkimail-ruby"
+  spec.metadata["source_code_uri"] = "https://github.com/aiw3ndil/enkimail"
 
   gemspec = File.basename(__FILE__)
   spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
