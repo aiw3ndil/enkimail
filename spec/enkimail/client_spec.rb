@@ -38,7 +38,7 @@ RSpec.describe Enkimail::Client do
         expect(payload["from"]).to eq("Sender Name <sender@example.com>")
         expect(payload["to"]).to eq("Recipient Name <recipient@example.com>")
         expect(payload["subject"]).to eq("Test Subject")
-        expect(payload["text"]).to eq("Hello world")
+        expect(payload["body"]).to eq("Hello world")
         expect(payload["attachments"]).to be_an(Array)
         expect(payload["attachments"].first["name"]).to eq("test.txt")
         expect(payload["attachments"].first["content"]).to eq([ "test content" ].pack("m0"))

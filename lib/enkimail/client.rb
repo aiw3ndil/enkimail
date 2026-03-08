@@ -44,13 +44,13 @@ module Enkimail
       }
 
       if mail.multipart?
-        payload[:text] = mail.text_part&.decoded
-        payload[:html] = mail.html_part&.decoded
+        payload[:body] = mail.text_part&.decoded
+        payload[:html_body] = mail.html_part&.decoded
       else
         if mail.content_type =~ /html/
-          payload[:html] = mail.body.decoded
+          payload[:html_body] = mail.body.decoded
         else
-          payload[:text] = mail.body.decoded
+          payload[:body] = mail.body.decoded
         end
       end
 
