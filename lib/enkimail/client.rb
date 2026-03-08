@@ -15,7 +15,6 @@ module Enkimail
     end
 
     def deliver(mail)
-      # IMPORTANT: Pass the Hash directly, Faraday :json request middleware will handle .to_json
       response = connection.post("/api/v1/transactional_emails") do |req|
         req.body = build_payload(mail)
       end
@@ -57,8 +56,8 @@ module Enkimail
         end
       end
 
-      # Remove empty or nil values but keep the Hash structure
-      payload.reject { |_, v| v.nil? || (v.respond_to?(:empty?) && v.empty?) }
+      # Clean up nil values
+      payload.compact
     end
 
     def build_attachments(mail)
