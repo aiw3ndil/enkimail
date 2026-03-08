@@ -7,8 +7,8 @@ RSpec.describe Enkimail::Client do
   let(:client) { described_class.new(api_key) }
   let(:mail) do
     Mail.new do
-      from    "sender@example.com"
-      to      "recipient@example.com"
+      from    "Sender Name <sender@example.com>"
+      to      "Recipient Name <recipient@example.com>"
       subject "Test Subject"
       body    "Hello world"
       
@@ -35,8 +35,8 @@ RSpec.describe Enkimail::Client do
 
       expect(a_request(:post, endpoint).with { |req|
         payload = JSON.parse(req.body)
-        expect(payload["from"]).to eq("sender@example.com")
-        expect(payload["to"]).to eq(["recipient@example.com"])
+        expect(payload["from"]).to eq("Sender Name <sender@example.com>")
+        expect(payload["to"]).to eq("Recipient Name <recipient@example.com>")
         expect(payload["subject"]).to eq("Test Subject")
         expect(payload["text"]).to eq("Hello world")
         expect(payload["attachments"]).to be_an(Array)

@@ -1,6 +1,6 @@
 example_id                                     | status | run_time        |
 ---------------------------------------------- | ------ | --------------- |
-./spec/enkimail/client_spec.rb[1:1:1]          | passed | 0.3693 seconds  |
-./spec/enkimail/client_spec.rb[1:1:2]          | passed | 0.01895 seconds |
-./spec/enkimail/delivery_method_spec.rb[1:1:1] | passed | 0.07035 seconds |
-./spec/enkimail/delivery_method_spec.rb[1:1:2] | passed | 0.00033 seconds |
+./spec/enkimail/client_spec.rb[1:1:1]          | passed | 0.39165 seconds |
+./spec/enkimail/client_spec.rb[1:1:2]          | passed | 0.02099 seconds |
+./spec/enkimail/delivery_method_spec.rb[1:1:1] | passed | 0.07246 seconds |
+./spec/enkimail/delivery_method_spec.rb[1:1:2] | passed | 0.00045 seconds |

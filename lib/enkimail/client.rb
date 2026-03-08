@@ -34,16 +34,27 @@ module Enkimail
     end
 
     def build_payload(mail)
-      {
-        from: mail.from&.first,
-        to: mail.to,
-        cc: mail.cc,
-        bcc: mail.bcc,
-        subject: mail.subject,
-        text: mail.text_part&.body&.decoded || (mail.multipart? ? nil : mail.body&.decoded),
-        html: mail.html_part&.body&.decoded,
+      payload = {
+        from: mail[:from]&.to_s,
+        to: mail[:to]&.to_s,
+        cc: mail[:cc]&.to_s,
+        bcc: mail[:bcc]&.to_s,
+        subject: mail.subject&.to_s,
         attachments: build_attachments(mail)
-      }.compact
+      }
+
+      if mail.multipart?
+        payload[:text] = mail.text_part&.decoded
+        payload[:html] = mail.html_part&.decoded
+      else
+        if mail.content_type =~ /html/
+          payload[:html] = mail.body.decoded
+        else
+          payload[:text] = mail.body.decoded
+        end
+      end
+
+      payload.compact
     end
 
     def build_attachments(mail)
