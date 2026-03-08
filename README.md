@@ -27,6 +27,14 @@ Or install it manually:
 
     $ gem install enkimail
 
+## Prerequisites
+
+Before using the gem, ensure that:
+1.  **Verified Domain:** Your sending domain must be verified in the Enkimail dashboard.
+2.  **Verified Sender:** The `from` email address you use must be a verified sender in your Enkimail account.
+
+Emails sent from unverified domains or senders will be rejected by the API.
+
 ## Configuration in Rails
 
 To use Enkimail as your email provider, edit your environment configuration file (e.g., `config/environments/production.rb`):
@@ -38,6 +46,10 @@ Rails.application.configure do
   config.action_mailer.enkimail_settings = {
     api_key: ENV['ENKIMAIL_API_KEY']
   }
+
+  # Optional: Configure a global 'from' address
+  # This address MUST be a verified sender in your Enkimail dashboard.
+  config.action_mailer.default_options = { from: 'no-reply@yourdomain.com' }
 end
 ```
 
@@ -50,7 +62,18 @@ end
 
 ## Usage
 
-Once configured, you can send emails as you normally do with ActionMailer:
+You can set the `from` address globally in your `ApplicationMailer` or specifically in each mailer method. Remember that Enkimail requires the sender to be verified.
+
+### Setting a Default Sender
+
+```ruby
+class ApplicationMailer < ActionMailer::Base
+  default from: 'info@yourdomain.com'
+  layout 'mailer'
+end
+```
+
+### Overriding the Sender in a Specific Mailer
 
 ```ruby
 class UserMailer < ApplicationMailer
@@ -59,7 +82,7 @@ class UserMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: 'Welcome to Enkimail',
-      from: 'no-reply@yourdomain.com'
+      from: 'onboarding@yourdomain.com' # Must be a verified sender
     )
   end
 end
