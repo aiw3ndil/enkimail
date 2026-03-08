@@ -15,8 +15,9 @@ module Enkimail
     end
 
     def deliver(mail)
+      # IMPORTANT: Pass the Hash directly, Faraday :json request middleware will handle .to_json
       response = connection.post("/api/v1/transactional_emails") do |req|
-        req.body = build_payload(mail).to_json
+        req.body = build_payload(mail)
       end
 
       handle_response(response)
@@ -37,26 +38,27 @@ module Enkimail
 
     def build_payload(mail)
       payload = {
-        from: mail[:from]&.to_s,
-        to: mail[:to]&.to_s,
-        cc: mail[:cc]&.to_s,
-        bcc: mail[:bcc]&.to_s,
-        subject: mail.subject&.to_s,
+        from: (mail.from || []).join(", "),
+        to: (mail.to || []).join(", "),
+        cc: (mail.cc || []).join(", "),
+        bcc: (mail.bcc || []).join(", "),
+        subject: mail.subject,
         attachments: build_attachments(mail)
       }
 
       if mail.multipart?
-        payload[:body] = mail.text_part&.decoded
-        payload[:html_body] = mail.html_part&.decoded
+        payload[:body] = mail.text_part&.body&.decoded
+        payload[:html_body] = mail.html_part&.body&.decoded
       else
         if mail.content_type =~ /html/
-          payload[:html_body] = mail.body.decoded
+          payload[:html_body] = mail.body&.decoded
         else
-          payload[:body] = mail.body.decoded
+          payload[:body] = mail.body&.decoded
         end
       end
 
-      payload.compact
+      # Remove empty or nil values but keep the Hash structure
+      payload.reject { |_, v| v.nil? || (v.respond_to?(:empty?) && v.empty?) }
     end
 
     def build_attachments(mail)
