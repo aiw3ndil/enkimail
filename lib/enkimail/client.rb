@@ -11,7 +11,7 @@ module Enkimail
 
     def initialize(api_key, base_url: nil)
       @api_key = api_key
-      @base_url = base_url || DEFAULT_BASE_URL
+      @base_url = (base_url || DEFAULT_BASE_URL).chomp("/")
     end
 
     def deliver(mail)
@@ -20,6 +20,8 @@ module Enkimail
       end
 
       handle_response(response)
+    rescue Faraday::Error => e
+      raise Error, "Enkimail Connection Error: #{e.message}"
     end
 
     private
@@ -70,11 +72,16 @@ module Enkimail
     end
 
     def handle_response(response)
-      unless response.success?
-        error_message = JSON.parse(response.body)["error"] rescue "Unknown API error"
-        raise Error, "Enkimail API Error (#{response.status}): #{error_message}"
+      return response if response.success?
+
+      begin
+        error_info = JSON.parse(response.body)
+        error_message = error_info["error"] || error_info["errors"] || "Unknown API error"
+      rescue JSON::ParserError
+        error_message = "HTTP #{response.status}: #{response.body[0..100]}"
       end
-      response
+
+      raise Error, "Enkimail API Error (#{response.status}): #{error_message}"
     end
   end
 end
