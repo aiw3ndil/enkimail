@@ -2,11 +2,11 @@
 
 [![Gem Version](https://badge.fury.io/rb/enkimail.svg)](https://badge.fury.io/rb/enkimail)
 
-`enkimail` is the official gem for integrating [Enkimail](https://enkimail.com) transactional email service with Ruby on Rails. It allows you to send emails using Enkimail's infrastructure simply by configuring the ActionMailer `delivery_method`.
+`enkimail` is the official gem for integrating [Enkimail](https://enkimail.com) transactional email service with Ruby on Rails and Sinatra applications. It allows you to send emails using Enkimail's infrastructure simply by configuring the ActionMailer or `Mail` `delivery_method`.
 
 ## Features
 
-*   **Native Rails Integration:** Automatically registers as an ActionMailer delivery method.
+*   **Native Rails & Sinatra Integration:** Automatically registers as an ActionMailer delivery method in Rails, and works out-of-the-box with the `mail` gem in Sinatra.
 *   **Multipart Support:** Automatically handles HTML and plain text email bodies.
 *   **Attachments:** Built-in support for sending attachments (automatically Base64 encoded for the API).
 *   **Flexible Configuration:** Allows defining a `base_url` for testing in development or staging environments.
@@ -96,6 +96,67 @@ The gem handles attachment processing automatically:
 def invoice_email(user, invoice_pdf)
   attachments['invoice.pdf'] = invoice_pdf
   mail(to: user.email, subject: 'Your Invoice')
+end
+```
+
+## Usage in Sinatra
+
+Enkimail can be used directly in **Sinatra** (or any standalone Ruby application) through the bundled `mail` gem.
+
+### 1. Configuration
+
+Configure `Mail.defaults` with `Enkimail::DeliveryMethod` and your API key:
+
+```ruby
+require 'sinatra'
+require 'enkimail'
+
+Mail.defaults do
+  delivery_method Enkimail::DeliveryMethod,
+                  api_key: ENV['ENKIMAIL_API_KEY'],
+                  base_url: ENV['ENKIMAIL_BASE_URL'] # Optional (defaults to https://api.enkimail.com)
+end
+```
+
+### 2. Sending Emails in Routes
+
+Use `Mail.deliver` inside your Sinatra routes:
+
+```ruby
+post '/contact' do
+  Mail.deliver do
+    to      params[:email]
+    from    'no-reply@yourdomain.com' # Must be a verified sender
+    subject 'Thank you for reaching out'
+    body    "Hi #{params[:name]}, we received your message!"
+  end
+
+  'Email sent'
+end
+```
+
+### 3. Multipart (HTML & Text) and Attachments
+
+```ruby
+post '/welcome' do
+  Mail.deliver do
+    to      params[:email]
+    from    'welcome@yourdomain.com' # Must be a verified sender
+    subject 'Welcome to our service!'
+
+    text_part do
+      body "Welcome #{params[:name]}! Visit https://yourdomain.com"
+    end
+
+    html_part do
+      content_type 'text/html; charset=UTF-8'
+      body "<h1>Welcome, #{params[:name]}!</h1><p>Thanks for signing up.</p>"
+    end
+
+    add_file '/path/to/guide.pdf'
+  end
+
+  'Welcome email sent'
 end
 ```
 
